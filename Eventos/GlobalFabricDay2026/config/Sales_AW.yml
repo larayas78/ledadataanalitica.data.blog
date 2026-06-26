@@ -1,0 +1,33 @@
+version: "1.0"
+template: query-to-lakehouse
+
+source:
+  type: sql_database
+  name: sql_Sales_AW
+  schema: SalesLT
+
+destination:
+  type: lakehouse
+  name: lh_Sales_AW
+
+entities:
+
+  - name: SalesOrderHeader
+    destination_table: SalesLT_SalesOrderHeader
+    query: |
+      SELECT SalesOrderID, OrderDate, DueDate, ShipDate, Status,
+             CustomerID, SubTotal, TaxAmt, Freight,
+             ISNULL(SubTotal + TaxAmt + Freight, 0) AS TotalDue,
+             ModifiedDate
+      FROM SalesLT.SalesOrderHeader
+      -- WHERE OrderDate >= '@watermark'  -- reemplazar @watermark por fecha para carga incremental
+
+  - name: SalesOrderDetail
+    destination_table: SalesLT_SalesOrderDetail
+    query: |
+      SELECT SalesOrderID, SalesOrderDetailID, OrderQty, ProductID,
+             UnitPrice, UnitPriceDiscount,
+             ISNULL(UnitPrice * (1.0 - UnitPriceDiscount) * OrderQty, 0.0) AS LineTotal,
+             ModifiedDate
+      FROM SalesLT.SalesOrderDetail
+      -- WHERE ModifiedDate >= '@watermark'  -- reemplazar @watermark por fecha para carga incremental

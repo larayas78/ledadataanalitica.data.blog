@@ -1,0 +1,37 @@
+version: "1.0"
+template: query-to-lakehouse
+
+source:
+  type: sql_database
+  name: sql_Sales_AW
+  schema: SalesLT
+
+destination:
+  type: lakehouse
+  name: lh_Sales_AW
+
+entities:
+
+  # --- Clientes y Direcciones ---
+  - name: Customer
+    destination_table: SalesLT_Customer
+    query: |
+      SELECT CustomerID, NameStyle, Title, FirstName, MiddleName, LastName,
+             Suffix, CompanyName, SalesPerson, EmailAddress, Phone, ModifiedDate
+      FROM SalesLT.Customer
+      -- WHERE ModifiedDate > '2024-01-01'
+
+  - name: Address
+    destination_table: SalesLT_Address
+    query: |
+      SELECT AddressID, AddressLine1, AddressLine2, City, StateProvince,
+             CountryRegion, PostalCode, ModifiedDate
+      FROM SalesLT.Address
+      -- WHERE CountryRegion = 'United States'
+
+  - name: CustomerAddress
+    destination_table: SalesLT_CustomerAddress
+    query: |
+      SELECT CustomerID, AddressID, AddressType, ModifiedDate
+      FROM SalesLT.CustomerAddress
+      -- WHERE AddressType = 'Main Office'

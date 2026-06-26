@@ -1,0 +1,33 @@
+version: "1.0"
+template: query-to-lakehouse
+
+source:
+  type: sql_database
+  name: sql_Sales_AW
+  schema: SalesLT
+
+destination:
+  type: lakehouse
+  name: lh_Sales_AW
+
+entities:
+
+  - name: ProductCategory
+    destination_table: ProductCategory
+    query: |
+      SELECT ProductCategoryID, ParentProductCategoryID, Name, ModifiedDate
+      FROM SalesLT.ProductCategory
+
+  - name: ProductModel
+    destination_table: ProductModel
+    query: |
+      SELECT ProductModelID, Name, ModifiedDate
+      FROM SalesLT.ProductModel
+
+  - name: Product
+    destination_table: Product
+    query: |
+      SELECT ProductID, Name, ProductNumber, Color, StandardCost, ListPrice,
+             Size, Weight, ProductCategoryID, ProductModelID,
+             SellStartDate, ModifiedDate
+      FROM SalesLT.Product
